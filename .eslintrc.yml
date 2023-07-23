@@ -1,0 +1,32 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - standard-with-typescript
+  - plugin:react/recommended
+  - plugin:react/jsx-runtime
+  - prettier
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+  project: ./tsconfig.json
+plugins:
+  - react
+  - react-hooks
+rules:
+  react-hooks/rules-of-hooks: error
+  react-hooks/exhaustive-deps: off
+  react/react-in-jsx-scope: off
+  react/prop-types: off
+  '@typescript-eslint/explicit-function-return-type': off
+  'no-unused-vars': off
+  '@typescript-eslint/no-unused-vars':
+    - 2
+    - varsIgnorePattern: '^_'
+    - argsIgnorePattern: '^__'
+settings:
+  react:
+    version: detect
+ignorePatterns:
+  - vite.config.ts
+  - vite-env.d.ts

@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .center {
+        @apply flex justify-center items-center;
+    }
+
+    .vstack {
+        @apply flex flex-col justify-center items-center gap-5;
+    }
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Zen Kaku Gothic New';
+    src: url('./assets/ZenKakuGothicNew-Regular.woff2') format('woff2');
+}
+
+html {
+    font-family: 'Inter', 'Zen Kaku Gothic New', 'sans-serif';
+}
