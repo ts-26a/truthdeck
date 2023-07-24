@@ -1,14 +1,15 @@
-export * from "./timeline";
-export * from "./userStatuses";
-import { ItemInterface } from "react-sortablejs";
+export * from './timeline';
+export * from './userStatuses';
+import { ItemInterface } from 'react-sortablejs';
 
-interface TimelineColumnType  {
-    name: "Timeline";
+interface TimelineColumnType {
+  name: 'Timeline';
 }
 
 interface UserStatusesColumnType {
-    name: "UserStatuses";
-    userId: string;
+  name: 'UserStatuses';
+  userId: string;
 }
 
-export type ColumnType = ItemInterface & (TimelineColumnType | UserStatusesColumnType);
+export type ColumnType = ItemInterface &
+  (TimelineColumnType | UserStatusesColumnType);

@@ -4,7 +4,7 @@ import { useCookies } from 'react-cookie';
 import Timeline from './columns/timeline';
 import { ApiContext, UserStreamContext } from '@/hooks/';
 import UserStatuses from './columns/userStatuses';
-import { ReactSortable } from "react-sortablejs";
+import { ReactSortable } from 'react-sortablejs';
 import { ColumnType } from './columns';
 
 export default function Home() {
@@ -14,9 +14,9 @@ export default function Home() {
   const [data, setData] = useState<mastodon.Client | undefined>();
   const [ws, setWs] = useState<WsEvents | undefined>();
   const [columns, setColumns] = useState<ColumnType[]>([
-    {id: "1", name: "Timeline"},
-    {id: "2", name: "UserStatuses", userId: "110644904531275279"},
-    {id: "3", name: "UserStatuses", userId: "107780257626128497"}
+    { id: '1', name: 'Timeline' },
+    { id: '2', name: 'UserStatuses', userId: '110644904531275279' },
+    { id: '3', name: 'UserStatuses', userId: '107780257626128497' },
   ]);
   useEffect(() => {
     login({
@@ -62,17 +62,27 @@ export default function Home() {
     return (
       <ApiContext.Provider value={data}>
         <UserStreamContext.Provider value={ws}>
-          <ReactSortable list={columns} setList={setColumns} className='flex flex-row' handle='.column-dnd-handle' animation={300}>
-            {
-              columns.map((col, idx) => {
-                switch (col.name) {
-                  case 'Timeline':
-                    return <Timeline num={idx + 1} key="Timeline" />
-                  case 'UserStatuses':
-                    return <UserStatuses num={idx + 1} userId={col.userId} key={"userStatuses-" + col.userId} />
-                }
-  })
-            }
+          <ReactSortable
+            list={columns}
+            setList={setColumns}
+            className="flex flex-row"
+            handle=".column-dnd-handle"
+            animation={300}
+          >
+            {columns.map((col, idx) => {
+              switch (col.name) {
+                case 'Timeline':
+                  return <Timeline num={idx + 1} key="Timeline" />;
+                case 'UserStatuses':
+                  return (
+                    <UserStatuses
+                      num={idx + 1}
+                      userId={col.userId}
+                      key={'userStatuses-' + col.userId}
+                    />
+                  );
+              }
+            })}
           </ReactSortable>
         </UserStreamContext.Provider>
       </ApiContext.Provider>
