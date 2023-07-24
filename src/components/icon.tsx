@@ -4,10 +4,12 @@ import Star from '@/assets/star.svg';
 
 interface iconProps {
   className?: string;
+  width?: string;
+  height?: string;
   size?: string;
 }
 
-function SvgIcon(props: iconProps & { svg: string }) {
+export function SvgIcon(props: iconProps & { svg: string }) {
   return (
     <div
       style={{
@@ -17,8 +19,8 @@ function SvgIcon(props: iconProps & { svg: string }) {
         WebkitMaskRepeat: 'no-repeat',
         maskPosition: 'center',
         WebkitMaskPosition: 'center',
-        width: props.size,
-        height: props.size,
+        width: props.size || props.width,
+        height: props.size || props.height,
       }}
       className={props.className}
     ></div>

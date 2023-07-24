@@ -4,6 +4,8 @@ import { useCookies } from 'react-cookie';
 import Timeline from './columns/timeline';
 import { ApiContext, UserStreamContext } from '@/hooks/';
 import UserStatuses from './columns/userStatuses';
+import { ReactSortable } from "react-sortablejs";
+import { ColumnType } from './columns';
 
 export default function Home() {
   const [cookies, _setCookie, _removeCookie] = useCookies();
@@ -11,6 +13,11 @@ export default function Home() {
   const [error, setError] = useState<any>(null);
   const [data, setData] = useState<mastodon.Client | undefined>();
   const [ws, setWs] = useState<WsEvents | undefined>();
+  const [columns, setColumns] = useState<ColumnType[]>([
+    {id: "1", name: "Timeline"},
+    {id: "2", name: "UserStatuses", userId: "110644904531275279"},
+    {id: "3", name: "UserStatuses", userId: "107780257626128497"}
+  ]);
   useEffect(() => {
     login({
       url: 'https://truthsocial.com',
@@ -55,11 +62,18 @@ export default function Home() {
     return (
       <ApiContext.Provider value={data}>
         <UserStreamContext.Provider value={ws}>
-          <div className="flex flex-row bg-gray-100">
-            <Timeline num={1} />
-            <div className="h-screen w-[5px] " />
-            <UserStatuses num={2} userId="110644904531275279" />
-          </div>
+          <ReactSortable list={columns} setList={setColumns} className='flex flex-row' handle='.column-dnd-handle' animation={300}>
+            {
+              columns.map((col, idx) => {
+                switch (col.name) {
+                  case 'Timeline':
+                    return <Timeline num={idx + 1} key="Timeline" />
+                  case 'UserStatuses':
+                    return <UserStatuses num={idx + 1} userId={col.userId} key={"userStatuses-" + col.userId} />
+                }
+  })
+            }
+          </ReactSortable>
         </UserStreamContext.Provider>
       </ApiContext.Provider>
     );

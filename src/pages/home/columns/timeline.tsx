@@ -31,7 +31,7 @@ export default function Timeline({ num }: { num: number }) {
       setHasMore(false);
       return;
     }
-    setTruths([...truths, ...next.value]);
+    setTruths([...new Set([...truths, ...next.value])]);
   };
   return (
     <div className="flex flex-col h-screen">

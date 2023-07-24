@@ -71,6 +71,7 @@ function TruthImage(status: mastodon.v1.Status) {
             <img
               src={media.url!}
               className="row-span-1 w-full h-[125px] rounded-md object-cover"
+              key={media.id}
             />
           </Zoom>
         );
