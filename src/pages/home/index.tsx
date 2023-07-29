@@ -6,6 +6,7 @@ import { ApiContext, UserStreamContext } from '@/hooks/';
 import UserStatuses from './columns/userStatuses';
 import { ReactSortable } from 'react-sortablejs';
 import { ColumnType } from './columns';
+import Sidebar from './sidebar';
 
 export default function Home() {
   const [cookies, _setCookie, _removeCookie] = useCookies();
@@ -46,9 +47,7 @@ export default function Home() {
         setLoading(false);
         setError(e);
       });
-    return () => {
-      ws?.disconnect();
-    };
+    return ws?.disconnect;
   }, []);
 
   if (!document.cookie.includes('access_token')) {
@@ -62,28 +61,31 @@ export default function Home() {
     return (
       <ApiContext.Provider value={data}>
         <UserStreamContext.Provider value={ws}>
-          <ReactSortable
-            list={columns}
-            setList={setColumns}
-            className="flex flex-row"
-            handle=".column-dnd-handle"
-            animation={300}
-          >
-            {columns.map((col, idx) => {
-              switch (col.name) {
-                case 'Timeline':
-                  return <Timeline num={idx + 1} key="Timeline" />;
-                case 'UserStatuses':
-                  return (
-                    <UserStatuses
-                      num={idx + 1}
-                      userId={col.userId}
-                      key={'userStatuses-' + col.userId}
-                    />
-                  );
-              }
-            })}
-          </ReactSortable>
+          <div className="flex flex-row">
+            <Sidebar columns={columns} setColumns={setColumns} />
+            <ReactSortable
+              list={columns}
+              setList={setColumns}
+              className="flex flex-row gap-[3px]"
+              handle=".column-dnd-handle"
+              animation={300}
+            >
+              {columns.map((col, idx) => {
+                switch (col.name) {
+                  case 'Timeline':
+                    return <Timeline num={idx + 1} key="Timeline" />;
+                  case 'UserStatuses':
+                    return (
+                      <UserStatuses
+                        num={idx + 1}
+                        userId={col.userId}
+                        key={'userStatuses-' + col.userId}
+                      />
+                    );
+                }
+              })}
+            </ReactSortable>
+          </div>
         </UserStreamContext.Provider>
       </ApiContext.Provider>
     );

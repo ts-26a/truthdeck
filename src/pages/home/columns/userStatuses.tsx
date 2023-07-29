@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import BeatLoader from 'react-spinners/BeatLoader';
 import { type mastodon } from 'masto';
-import InfScroll from './infinite_scroll';
 import Truth from '@/components/truth';
 import { useApi } from '@/hooks';
-import ColumnHeader from './header';
+import { Column } from './column';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export default function UserStatuses({
   userId,
@@ -19,12 +19,26 @@ export default function UserStatuses({
   const userStatuseesPaginator = useMemo(() => {
     return api.v1.accounts.listStatuses(userId, { limit: 40 });
   }, []);
+  const [minId, setMinId] = useState('');
   const [userName, setUserName] = useState('');
+  const uuid = useMemo(() => crypto.randomUUID(), []);
   useEffect(() => {
     userStatuseesPaginator.then((tr) => {
       setTruths(tr);
       setUserName(tr[0]?.account.username);
+      setMinId(tr[0].id);
     });
+    const interval = setInterval(() => {
+      api.v1.accounts
+        .listStatuses(userId, { limit: 10, minId: minId })
+        .then((tr) => {
+          if (tr.length !== 0) {
+            setTruths([...tr, ...truths]);
+            setMinId(tr[0].id);
+          }
+        });
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
   const loadMore = async () => {
     const next = await userStatuseesPaginator.next();
@@ -36,20 +50,30 @@ export default function UserStatuses({
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <ColumnHeader num={num} name={'@' + userName} />
-      <InfScroll
-        dataLength={truths.length}
-        next={loadMore}
-        hasMore={hasMore}
-        loader={
-          <BeatLoader className="flex justify-center m-[10px]" key="loader" />
-        }
-      >
-        {truths.map((tr) => (
-          <Truth {...tr} key={tr.id} />
-        ))}
-      </InfScroll>
-    </div>
+    <Column
+      num={num}
+      name={'User @' + userName}
+      scrollToTop={() => {
+        document
+          .querySelector(`div[id="${uuid}"]`)
+          ?.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
+      }}
+    >
+      <div className="overflow-auto flex flex-col bg-gray-200" id={uuid}>
+        <InfiniteScroll
+          dataLength={truths.length}
+          next={loadMore}
+          hasMore={hasMore}
+          loader={
+            <BeatLoader className="flex justify-center m-[10px]" key="loader" />
+          }
+          scrollableTarget={uuid}
+        >
+          {truths.map((tr) => (
+            <Truth {...tr} key={tr.id} />
+          ))}
+        </InfiniteScroll>
+      </div>
+    </Column>
   );
 }

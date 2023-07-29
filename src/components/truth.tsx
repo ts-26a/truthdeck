@@ -3,8 +3,7 @@ import { ReplyIcon, RetruthIcon, LikeIcon } from './icon.tsx';
 import { useState } from 'react';
 import { useApi } from '../hooks';
 import ReactTimeAgo from 'react-time-ago';
-import Zoom from 'react-medium-image-zoom';
-import 'react-medium-image-zoom/dist/styles.css';
+import ModalImage from 'react-modal-image';
 
 function TruthHeader(status: mastodon.v1.Status) {
   return (
@@ -55,25 +54,24 @@ function TruthImage(status: mastodon.v1.Status) {
   if (status.mediaAttachments.length == 0) return <></>;
   if (status.mediaAttachments.length == 1) {
     return (
-      <Zoom>
-        <img
-          src={status.mediaAttachments[0].url!}
-          className="max-h-[250px] w-full object-cover"
-        />
-      </Zoom>
+      <ModalImage
+        small={status.mediaAttachments[0].url!}
+        large={status.mediaAttachments[0].url!}
+        showRotate={true}
+        className="max-h-[250px] w-full object-cover rounded-md"
+      />
     );
   }
   return (
-    <div className="grid grid-cols-2 gap-[2px]">
+    <div className="flex flex-row flex-wrap gap-[2px]">
       {status.mediaAttachments.map((media) => {
         return (
-          <Zoom>
-            <img
-              src={media.url!}
-              className="row-span-1 w-full h-[125px] rounded-md object-cover"
-              key={media.id}
-            />
-          </Zoom>
+          <ModalImage
+            small={media.url!}
+            large={media.url!}
+            showRotate={true}
+            className="object-cover rounded-md basis-1/2"
+          />
         );
       })}
     </div>

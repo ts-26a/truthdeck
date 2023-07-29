@@ -20,6 +20,14 @@ export default function License() {
       >
         SIL Open Font License 1.1
       </a>
+      <br />
+      Google Material Symbols:
+      <a
+        href="https://www.apache.org/licenses/LICENSE-2.0.txt"
+        target="_blank"
+        rel="noreferrer"
+        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+      />
     </>
   );
 }
