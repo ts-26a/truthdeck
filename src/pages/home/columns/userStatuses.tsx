@@ -6,7 +6,7 @@ import { useApi } from '@/hooks';
 import { Column } from './column';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default function UserStatuses({
+export default function UserStatusesColumn({
   userId,
   num,
 }: {
@@ -15,18 +15,16 @@ export default function UserStatuses({
 }) {
   const api = useApi();
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const userStatuseesPaginator = useMemo(() => {
-    return api.v1.accounts.$select(userId).statuses.list({ limit: 40 });
-  }, []);
+  const [maxId, setMaxId] = useState("");
   const [minId, setMinId] = useState('');
   const [userName, setUserName] = useState('');
   const uuid = useMemo(() => crypto.randomUUID(), []);
   useEffect(() => {
-    userStatuseesPaginator.then((tr) => {
+    api.v1.accounts.$select(userId).statuses.list({ limit: 40 }).then((tr) => {
       setTruths(tr);
       setUserName(tr[0]?.account.username);
       setMinId(tr[0].id);
+      setMaxId(tr.slice(-1)[0].id);
     });
     const interval = setInterval(() => {
       api.v1.accounts
@@ -42,12 +40,9 @@ export default function UserStatuses({
     return () => clearInterval(interval);
   }, []);
   const loadMore = async () => {
-    const next = await userStatuseesPaginator.next();
-    if (next.done === true || next.value === undefined) {
-      setHasMore(false);
-      return;
-    }
-    setTruths([...truths, ...next.value]);
+    const next = await api.v1.accounts.$select(userId).statuses.list({ limit: 40, maxId: maxId });
+    setTruths([...truths, ...next]);
+    setMaxId(next.slice(-1)[0].id);
   };
 
   return (
@@ -64,7 +59,7 @@ export default function UserStatuses({
         <InfiniteScroll
           dataLength={truths.length}
           next={loadMore}
-          hasMore={hasMore}
+          hasMore={true}
           loader={
             <BeatLoader className="m-[10px] flex justify-center" key="loader" />
           }

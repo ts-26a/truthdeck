@@ -6,20 +6,17 @@ import { useApi, useUserStream } from '@/hooks';
 import { Column } from './column';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-export default function Timeline({ num }: { num: number }) {
+export default function TimelineColumn({ num }: { num: number }) {
   const api = useApi();
-  const userStream = useUserStream();
+  const subscription = useUserStream();
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const timelinePaginator = useMemo(() => {
-    return api.v1.timelines.home.list({ limit: 40 });
-  }, []);
   const uuid = useMemo(() => crypto.randomUUID(), []);
+  const [maxId, setMaxId] = useState("");
   useEffect(() => {
-    timelinePaginator.then((tr) => {
+    api.v1.timelines.home.list({ limit: 40 }).then((tr) => {
       setTruths(tr);
+      setMaxId(tr.slice(-1)[0].id);
     });
-    const subscription = userStream.user.subscribe();
     (async function () {
       for await (const evt of subscription) {
         if (evt.event === 'update') {
@@ -27,15 +24,11 @@ export default function Timeline({ num }: { num: number }) {
         }
       }
     })();
-    return subscription.unsubscribe;
   }, []);
   const loadMore = async () => {
-    const next = await timelinePaginator.next();
-    if (next.done === true || next.value === undefined) {
-      setHasMore(false);
-      return;
-    }
-    setTruths([...truths, ...next.value]);
+    const next = await api.v1.timelines.home.list({ limit: 40, maxId: maxId });
+    setTruths([...truths, ...next]);
+    setMaxId(next.slice(-1)[0].id);
   };
   return (
     <Column
@@ -51,7 +44,7 @@ export default function Timeline({ num }: { num: number }) {
         <InfiniteScroll
           dataLength={truths.length}
           next={loadMore}
-          hasMore={hasMore}
+          hasMore={true}
           loader={
             <BeatLoader className="m-[10px] flex justify-center" key="loader" />
           }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import Timeline from './columns/timeline';
-import UserStatuses from './columns/userStatuses';
+import TimelineColumn from './columns/timeline';
+import UserStatusesColumn from './columns/userStatuses';
+import NottificationsColumn from './columns/notifications';
 import { ReactSortable } from 'react-sortablejs';
 import { ColumnType } from './columns';
 import Sidebar from './sidebar';
@@ -9,6 +10,7 @@ import 'react-modal-video/scss/modal-video.scss';
 export default function Home() {
   const [columns, setColumns] = useState<ColumnType[]>([
     { id: '1', name: 'Timeline' },
+    { id: '4', name: 'Notifications' },
     { id: '2', name: 'UserStatuses', userId: '110644904531275279' },
     { id: '3', name: 'UserStatuses', userId: '107780257626128497' },
   ]);
@@ -31,15 +33,17 @@ export default function Home() {
         {columns.map((col, idx) => {
           switch (col.name) {
             case 'Timeline':
-              return <Timeline num={idx + 1} key="Timeline" />;
+              return <TimelineColumn num={idx + 1} key="Timeline" />;
             case 'UserStatuses':
               return (
-                <UserStatuses
+                <UserStatusesColumn
                   num={idx + 1}
                   userId={col.userId}
                   key={'userStatuses-' + col.userId}
                 />
               );
+            case 'Notifications':
+              return <NottificationsColumn num={idx + 1} key="Notification" />;
           }
         })}
       </ReactSortable>

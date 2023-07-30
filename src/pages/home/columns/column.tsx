@@ -3,6 +3,7 @@ import { SvgIcon } from '@/components/icon';
 import { ReactElement } from 'react';
 import Person from '@/assets/person.svg';
 import Home from '@/assets/home.svg';
+import Notifications from '@/assets/notifications.svg';
 
 function ColumnHeader({
   num,
@@ -41,6 +42,14 @@ function ColumnHeader({
                   size="30px"
                 />
               );
+            }  else if (name === "Notifications") {
+              return (
+                <SvgIcon
+                  svg={Notifications}
+                  className="aspect-square bg-gray-300"
+                  size="30px"
+                />
+              )
             }
           })()}
           {name}

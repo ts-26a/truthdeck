@@ -7,6 +7,7 @@ import { ReactSortable } from 'react-sortablejs';
 import Person from '@/assets/person.svg';
 import Plus from '@/assets/plus.svg';
 import Home from '@/assets/home.svg';
+import Notifications from '@/assets/notifications.svg';
 
 export default function Sidebar({
   columns,
@@ -49,6 +50,15 @@ export default function Sidebar({
                   key={'user-' + col.id}
                 />
               );
+            case 'Notifications':
+              return (
+                <SvgIcon
+                  svg={Notifications}
+                  size="35px"
+                  className="bg-gray-300"
+                  key="notifications"
+                />
+              )
           }
         })}
       </ReactSortable>
