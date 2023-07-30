@@ -22,6 +22,11 @@
     src: url('./assets/ZenKakuGothicNew-Regular.woff2') format('woff2');
 }
 
+@font-face {
+    font-family: 'twemoji';
+    src: url('./assets/twemoji.woff2') format('woff2')
+}
+
 html {
-    font-family: 'Inter', 'Zen Kaku Gothic New', 'sans-serif';
+    font-family: 'Inter', 'Zen Kaku Gothic New', 'twemoji', 'sans-serif';
 }
