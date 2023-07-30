@@ -16,11 +16,11 @@ export default function Sidebar({
   setColumns: React.Dispatch<React.SetStateAction<ColumnType[]>>;
 }) {
   return (
-    <div className="h-screen w-[60px] bg-gray-600 flex flex-col gap-[15px] p-[10px] items-center">
-      <div className="rounded-full w-[40px] aspect-square bg-blue-400 flex items-center justify-center">
+    <div className="flex h-screen w-[60px] flex-col items-center gap-[15px] bg-gray-600 p-[10px]">
+      <div className="flex aspect-square w-[40px] items-center justify-center rounded-full bg-blue-400">
         <SvgIcon svg={Edit} className="bg-white p-[4px]" size="30px" />
       </div>
-      <div className="rounded-full w-[40px] aspect-square bg-blue-400 flex items-center justify-center">
+      <div className="flex aspect-square w-[40px] items-center justify-center rounded-full bg-blue-400">
         <SvgIcon svg={Search} className="bg-white p-[4px]" size="30px" />
       </div>
       <ReactSortable
@@ -52,7 +52,7 @@ export default function Sidebar({
           }
         })}
       </ReactSortable>
-      <hr className="text-gray-400 w-11/12" />
+      <hr className="w-11/12 text-gray-400" />
       <SvgIcon svg={Plus} size="35px" className="bg-gray-300" />
     </div>
   );

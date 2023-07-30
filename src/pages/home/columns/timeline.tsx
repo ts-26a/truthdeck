@@ -47,13 +47,13 @@ export default function Timeline({ num }: { num: number }) {
           ?.scrollTo({ left: 0, top: 0, behavior: 'smooth' });
       }}
     >
-      <div className="overflow-auto flex flex-col bg-gray-200" id={uuid}>
+      <div className="flex flex-col overflow-auto bg-gray-200" id={uuid}>
         <InfiniteScroll
           dataLength={truths.length}
           next={loadMore}
           hasMore={hasMore}
           loader={
-            <BeatLoader className="flex justify-center m-[10px]" key="loader" />
+            <BeatLoader className="m-[10px] flex justify-center" key="loader" />
           }
           scrollableTarget={uuid}
         >

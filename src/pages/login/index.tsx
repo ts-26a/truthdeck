@@ -15,8 +15,8 @@ export default function Login() {
   const [accessToken, setAccessToken] = useState('');
   const [_cookies, setCookie, _removeCookie] = useCookies();
   return (
-    <div className="h-screen w-screen center bg-gray-200">
-      <div className="w-[600px] max-w-[80%] aspect-square vstack bg-white rounded-xl">
+    <div className="center h-screen w-screen bg-gray-200">
+      <div className="vstack aspect-square w-[600px] max-w-[80%] rounded-xl bg-white">
         <span className="max-w-[60%]">
           アクセストークンを入力してログインして下さい
         </span>
@@ -27,10 +27,10 @@ export default function Login() {
           onChange={(e) => {
             setAccessToken(e.target.value);
           }}
-          className="shadow appearance-none border rounded w-3/5 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline w-3/5 appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
         />
         <button
-          className="bg-gray-900 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="focus:shadow-outline rounded bg-gray-900 px-4 py-2 font-bold text-white hover:bg-gray-600 focus:outline-none"
           onClick={() => {
             const toastId = toast.loading('Please wait...');
             verifyCredentials(accessToken)
@@ -66,7 +66,7 @@ export default function Login() {
         </button>
         <a
           href="/how_to_get_access_token"
-          className="text-blue-500 hover:underline hover:text-orange-400"
+          className="text-blue-500 hover:text-orange-400 hover:underline"
         >
           🔗アクセストークンの取得方法
         </a>

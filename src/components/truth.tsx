@@ -9,17 +9,17 @@ import PlayCircle from '@/assets/play_circle.svg';
 
 function TruthHeader(status: mastodon.v1.Status) {
   return (
-    <div className="flex flex-col h-[40px]">
-      <span className="font-bold truncate">{status.account.displayName}</span>
-      <div className="flex truncate text-gray-700 text-sm">
-        <p className="text-gray-700 text-sm">@{status.account.username}</p>
+    <div className="flex h-[40px] flex-col">
+      <span className="truncate font-bold">{status.account.displayName}</span>
+      <div className="flex truncate text-sm text-gray-700">
+        <p className="text-sm text-gray-700">@{status.account.username}</p>
         <span className="px-1">·</span>
         <a href={status.uri} rel="noopener" target="_blank">
           <ReactTimeAgo
             date={Date.parse(status.createdAt)}
             locale="en-US"
             timeStyle="twitter"
-            className="text-gray-700 text-sm"
+            className="text-sm text-gray-700"
           />
         </a>
       </div>
@@ -38,18 +38,18 @@ function TruthBody(status: mastodon.v1.Status) {
         <>
           <input id="check1" className="peer hidden" type="checkbox" />
           <div
-            className={`relative overflow-hidden before:block before:absolute before:bottom-0 before:left-0 before:w-full before:h-[50px] before:content-[''] before:bg-gradient-to-t before:from-white break-all peer-checked:h-auto peer-checked:before:hidden`}
+            className={`relative overflow-hidden break-all before:absolute before:bottom-0 before:left-0 before:block before:h-[50px] before:w-full before:bg-gradient-to-t before:from-white before:content-[''] peer-checked:h-auto peer-checked:before:hidden`}
           >
-            <div dangerouslySetInnerHTML={{__html: status.content}} />
+            <div dangerouslySetInnerHTML={{ __html: status.content }} />
           </div>
           <label
             htmlFor="check1"
-            className="h-[20px] w-2/3 table absolute bottom-0 left-1/2 -translate-x-1/2 mx-auto my-0 z-20 px-[10px] py-0 bg-blue-500 rounded-xl text-center text-white before:content-['Read_more'] peer-checked:before:content-['Close'] peer-checked:static peer-checked:translate-x-0 hover:bg-blue-600"
+            className="absolute bottom-0 left-1/2 z-20 mx-auto my-0 table h-[20px] w-2/3 -translate-x-1/2 rounded-xl bg-blue-500 px-[10px] py-0 text-center text-white before:content-['Read_more'] hover:bg-blue-600 peer-checked:static peer-checked:translate-x-0 peer-checked:before:content-['Close']"
           />
         </>
       ) : (
-        <div className="h-auto relative overflow-hidden break-all">
-          <div dangerouslySetInnerHTML={{__html: status.content}} />
+        <div className="relative h-auto overflow-hidden break-all">
+          <div dangerouslySetInnerHTML={{ __html: status.content }} />
         </div>
       )}
     </div>
@@ -62,10 +62,18 @@ function TruthImage(status: mastodon.v1.Status) {
   if (status.mediaAttachments[0].type === 'video') {
     const video = status.mediaAttachments[0];
     const parser = new DOMParser();
-    const embedUrl = parser.parseFromString(status.card!.html!, 'text/html')!.body.querySelector("iframe")!.getAttribute("src")!;
+    const embedUrl = parser
+      .parseFromString(status.card!.html!, 'text/html')!
+      .body.querySelector('iframe')!
+      .getAttribute('src')!;
     return (
       <div key={video.id}>
-        <ModalVideo channel="custom" isOpen={isOpen} url={embedUrl + "?rel=0"} onClose={() => setOpen(false)} />
+        <ModalVideo
+          channel="custom"
+          isOpen={isOpen}
+          url={embedUrl + '?rel=0'}
+          onClose={() => setOpen(false)}
+        />
         <button onClick={() => setOpen(true)} className="relative bg-black">
           <img src={video.previewUrl} className="opacity-50" />
           <SvgIcon
@@ -77,26 +85,26 @@ function TruthImage(status: mastodon.v1.Status) {
       </div>
     );
   }
-  return <div className='flex flex-col w-full gap-[5px]'>
-    {
-      status.mediaAttachments.map((media) =>
+  return (
+    <div className="flex w-full flex-col gap-[5px]">
+      {status.mediaAttachments.map((media) => (
         <ModalImage
-        small={media.previewUrl}
-        large={media.url!}
-        showRotate={true}
-        className={"object-cover rounded-md w-full h-[100px]"}
-        key={media.id}
+          small={media.previewUrl}
+          large={media.url!}
+          showRotate={true}
+          className={'h-[100px] w-full rounded-md object-cover'}
+          key={media.id}
         />
-      )
-    }
-  </div>
+      ))}
+    </div>
+  );
 }
 function TruthFooter(originalStatus: mastodon.v1.Status) {
   const [status, setStatus] = useState(originalStatus);
   const api = useApi();
   const iconClass = 'flex-1 flex flex-row justify-center items-center gap-1';
   return (
-    <div className="flex flex-row w-full h-[20px] items-center mt-[7px]">
+    <div className="mt-[7px] flex h-[20px] w-full flex-row items-center">
       <div className={iconClass}>
         <button>
           <ReplyIcon className="bg-gray-700" size="16px" />
@@ -171,21 +179,21 @@ export default function Truth(props: mastodon.v1.Status) {
   return (
     <>
       {isRetruth && (
-        <div className="ml-[30px] flex flex-row items-center -mb-[10px] m-[2px] mr-[10px]">
-          <RetruthIcon className="bg-green-600 shrink-0" size="16px" />
-          <span className="truncate min-w-0">{props.account.displayName}</span>
+        <div className="m-[2px] -mb-[10px] ml-[30px] mr-[10px] flex flex-row items-center">
+          <RetruthIcon className="shrink-0 bg-green-600" size="16px" />
+          <span className="min-w-0 truncate">{props.account.displayName}</span>
           <span>&nbsp;Retweeted</span>
         </div>
       )}
-      <div className="w-[300px] flex flex-row pl-[5px] p-[10px]">
-        <div className="h-[40px] aspect-square rounded-md">
+      <div className="flex w-[300px] flex-row p-[10px] pl-[5px]">
+        <div className="aspect-square h-[40px] rounded-md">
           <img
             src={truth.account.avatar}
             className="rounded-md p-[2px]"
             alt={`${truth.account.displayName}'s avatar`}
           />
         </div>
-        <div className="flex-1 overflow-hidden flex flex-col mr-[3px]">
+        <div className="mr-[3px] flex flex-1 flex-col overflow-hidden">
           <TruthHeader {...truth} />
           <TruthBody {...truth} />
           <TruthImage {...truth} />

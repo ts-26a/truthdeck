@@ -15,15 +15,15 @@ function ColumnHeader({
 }) {
   return (
     <button onClick={onClick} className="w-[300px]">
-      <div className="h-[50px] bg-gray-600 px-[2px] flex flex-row">
-        <div className="flex flex-col text-gray-200 text-[12px] items-center">
+      <div className="flex h-[50px] flex-row bg-gray-600 px-[2px]">
+        <div className="flex flex-col items-center text-[12px] text-gray-200">
           <span>{num}</span>
           <SvgIcon
             svg={DragIndicator}
-            className="w-[10px] h-[28px] column-dnd-handle bg-gray-100 cursor-move"
+            className="column-dnd-handle h-[28px] w-[10px] cursor-move bg-gray-100"
           />
         </div>
-        <div className="flex items-center text-gray-100 font-bold ml-[4px]">
+        <div className="ml-[4px] flex items-center font-bold text-gray-100">
           {(() => {
             if (name === 'Timeline') {
               return (
@@ -62,9 +62,9 @@ export function Column({
   scrollToTop: () => any;
 }) {
   return (
-    <div className="flex flex-col h-screen w-[300px]">
+    <div className="flex h-screen w-[300px] flex-col">
       <ColumnHeader num={num} name={name} onClick={scrollToTop} />
-      <div className="overflow-scroll flex flex-col bg-gray-200">
+      <div className="flex flex-col overflow-scroll bg-gray-200">
         {children}
       </div>
     </div>
