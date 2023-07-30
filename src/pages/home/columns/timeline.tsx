@@ -12,19 +12,22 @@ export default function Timeline({ num }: { num: number }) {
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const timelinePaginator = useMemo(() => {
-    return api.v1.timelines.listHome({ limit: 40 });
+    return api.v1.timelines.home.list({ limit: 40 });
   }, []);
   const uuid = useMemo(() => crypto.randomUUID(), []);
   useEffect(() => {
     timelinePaginator.then((tr) => {
       setTruths(tr);
-      userStream.on('update', (data) => {
-        setTruths((trs) => {
-          if (trs.includes(data)) return trs;
-          return [data, ...trs];
-        });
-      });
     });
+    const subscription = userStream.user.subscribe();
+    (async function () {
+      for await (const evt of subscription) {
+        if (evt.event === 'update') {
+          setTruths((prev) => [evt.payload, ...prev]);
+        }
+      }
+    })();
+    return subscription.unsubscribe;
   }, []);
   const loadMore = async () => {
     const next = await timelinePaginator.next();
@@ -32,7 +35,7 @@ export default function Timeline({ num }: { num: number }) {
       setHasMore(false);
       return;
     }
-    setTruths([...new Set([...truths, ...next.value])]);
+    setTruths([...truths, ...next.value]);
   };
   return (
     <Column

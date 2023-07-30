@@ -1,10 +1,14 @@
-import { type WsEvents } from 'masto';
-import { createContext, useContext } from 'react';
+import { createStreamingAPIClient, type mastodon } from 'masto';
+import { useMemo } from 'react';
+import { useCookies } from 'react-cookie';
 
-export const UserStreamContext = createContext<WsEvents | undefined>(undefined);
-
-export function useUserStream(): WsEvents {
-  const ws = useContext(UserStreamContext);
-  if (ws === undefined) throw Error();
-  return ws;
+export function useUserStream(): mastodon.streaming.Client {
+  const [cookies, _setCookie, _removeCookie] = useCookies();
+  return useMemo(() => {
+    return createStreamingAPIClient({
+      streamingApiUrl: 'wss://truthsocial.com',
+      accessToken: cookies.access_token,
+      implementation: WebSocket,
+    });
+  }, [cookies]);
 }

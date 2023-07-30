@@ -1,13 +1,12 @@
-import { login } from 'masto';
+import { createRestAPIClient } from 'masto';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { useCookies } from 'react-cookie';
 
 async function verifyCredentials(accessToken: string) {
-  const masto = await login({
+  const masto = createRestAPIClient({
     url: 'https://truthsocial.com/',
     accessToken,
-    disableVersionCheck: true,
   });
   return await masto.v1.accounts.verifyCredentials();
 }

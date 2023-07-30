@@ -1,10 +1,18 @@
-import { type mastodon } from 'masto';
-import { createContext, useContext } from 'react';
+import { createRestAPIClient, type mastodon } from 'masto';
+import { useMemo } from 'react';
+import { useCookies } from 'react-cookie';
 
-export const ApiContext = createContext<mastodon.Client | undefined>(undefined);
-
-export function useApi(): mastodon.Client {
-  const api = useContext(ApiContext);
-  if (api === undefined) throw Error();
-  return api;
+export function useApi(): mastodon.rest.Client {
+  const [cookies, _setCookie, _removeCookie] = useCookies();
+  return useMemo(() => {
+    return createRestAPIClient({
+      url: 'https://truthsocial.com',
+      accessToken: cookies.access_token,
+      requestInit: {
+        headers: {
+          Accept: 'application/json',
+        },
+      },
+    });
+  }, [cookies]);
 }

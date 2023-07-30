@@ -17,7 +17,7 @@ export default function UserStatuses({
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const userStatuseesPaginator = useMemo(() => {
-    return api.v1.accounts.listStatuses(userId, { limit: 40 });
+    return api.v1.accounts.$select(userId).statuses.list({ limit: 40 });
   }, []);
   const [minId, setMinId] = useState('');
   const [userName, setUserName] = useState('');
@@ -30,7 +30,8 @@ export default function UserStatuses({
     });
     const interval = setInterval(() => {
       api.v1.accounts
-        .listStatuses(userId, { limit: 10, minId: minId })
+        .$select(userId)
+        .statuses.list({ limit: 10, minId: minId })
         .then((tr) => {
           if (tr.length !== 0) {
             setTruths([...tr, ...truths]);

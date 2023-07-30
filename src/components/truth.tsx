@@ -1,9 +1,11 @@
 import { type mastodon } from 'masto';
-import { ReplyIcon, RetruthIcon, LikeIcon } from './icon.tsx';
+import { ReplyIcon, RetruthIcon, LikeIcon, SvgIcon } from './icon.tsx';
 import { useState } from 'react';
 import { useApi } from '../hooks';
 import ReactTimeAgo from 'react-time-ago';
 import ModalImage from 'react-modal-image';
+import ModalVideo from 'react-modal-video';
+import PlayCircle from '@/assets/play_circle.svg';
 
 function TruthHeader(status: mastodon.v1.Status) {
   return (
@@ -25,16 +27,20 @@ function TruthHeader(status: mastodon.v1.Status) {
   );
 }
 
-function TruthBody(status: mastodon.v1.Status & { isLong: boolean }) {
+function TruthBody(status: mastodon.v1.Status) {
+  const parser = new DOMParser();
+  const text = parser.parseFromString(status.content, 'text/html').body
+    .textContent;
+  const isLongTruth = text !== null && text.length > 300;
   return (
     <div className="relative box-border">
-      {status.isLong ? (
+      {isLongTruth ? (
         <>
           <input id="check1" className="peer hidden" type="checkbox" />
           <div
             className={`relative overflow-hidden before:block before:absolute before:bottom-0 before:left-0 before:w-full before:h-[50px] before:content-[''] before:bg-gradient-to-t before:from-white break-all peer-checked:h-auto peer-checked:before:hidden`}
           >
-            <div dangerouslySetInnerHTML={{ __html: status.content }} />
+            <div dangerouslySetInnerHTML={{__html: status.content}} />
           </div>
           <label
             htmlFor="check1"
@@ -43,7 +49,7 @@ function TruthBody(status: mastodon.v1.Status & { isLong: boolean }) {
         </>
       ) : (
         <div className="h-auto relative overflow-hidden break-all">
-          <div dangerouslySetInnerHTML={{ __html: status.content }} />
+          <div dangerouslySetInnerHTML={{__html: status.content}} />
         </div>
       )}
     </div>
@@ -51,31 +57,39 @@ function TruthBody(status: mastodon.v1.Status & { isLong: boolean }) {
 }
 
 function TruthImage(status: mastodon.v1.Status) {
+  const [isOpen, setOpen] = useState(false);
   if (status.mediaAttachments.length == 0) return <></>;
-  if (status.mediaAttachments.length == 1) {
+  if (status.mediaAttachments[0].type === 'video') {
+    const video = status.mediaAttachments[0];
+    const parser = new DOMParser();
+    const embedUrl = parser.parseFromString(status.card!.html!, 'text/html')!.body.querySelector("iframe")!.getAttribute("src")!;
     return (
-      <ModalImage
-        small={status.mediaAttachments[0].url!}
-        large={status.mediaAttachments[0].url!}
-        showRotate={true}
-        className="max-h-[250px] w-full object-cover rounded-md"
-      />
+      <div key={video.id}>
+        <ModalVideo channel="custom" isOpen={isOpen} url={embedUrl + "?rel=0"} onClose={() => setOpen(false)} />
+        <button onClick={() => setOpen(true)} className="relative bg-black">
+          <img src={video.previewUrl} className="opacity-50" />
+          <SvgIcon
+            svg={PlayCircle}
+            size="50px"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-400"
+          />
+        </button>
+      </div>
     );
   }
-  return (
-    <div className="flex flex-row flex-wrap gap-[2px]">
-      {status.mediaAttachments.map((media) => {
-        return (
-          <ModalImage
-            small={media.url!}
-            large={media.url!}
-            showRotate={true}
-            className="object-cover rounded-md basis-1/2"
-          />
-        );
-      })}
-    </div>
-  );
+  return <div className='flex flex-col w-full gap-[5px]'>
+    {
+      status.mediaAttachments.map((media) =>
+        <ModalImage
+        small={media.previewUrl}
+        large={media.url!}
+        showRotate={true}
+        className={"object-cover rounded-md w-full h-[100px]"}
+        key={media.id}
+        />
+      )
+    }
+  </div>
 }
 function TruthFooter(originalStatus: mastodon.v1.Status) {
   const [status, setStatus] = useState(originalStatus);
@@ -93,13 +107,19 @@ function TruthFooter(originalStatus: mastodon.v1.Status) {
         <button
           onClick={() => {
             if (status.reblogged === true) {
-              api.v1.statuses.unreblog(status.id).then((st) => {
-                setStatus(st);
-              });
+              api.v1.statuses
+                .$select(status.id)
+                .unreblog()
+                .then((st) => {
+                  setStatus(st);
+                });
             } else {
-              api.v1.statuses.reblog(status.id).then((st) => {
-                setStatus(st);
-              });
+              api.v1.statuses
+                .$select(status.id)
+                .reblog()
+                .then((st) => {
+                  setStatus(st);
+                });
             }
           }}
         >
@@ -116,13 +136,19 @@ function TruthFooter(originalStatus: mastodon.v1.Status) {
         <button
           onClick={() => {
             if (status.favourited === true) {
-              api.v1.statuses.unfavourite(status.id).then((st) => {
-                setStatus(st);
-              });
+              api.v1.statuses
+                .$select(status.id)
+                .unfavourite()
+                .then((st) => {
+                  setStatus(st);
+                });
             } else {
-              api.v1.statuses.favourite(status.id).then((st) => {
-                setStatus(st);
-              });
+              api.v1.statuses
+                .$select(status.id)
+                .favourite()
+                .then((st) => {
+                  setStatus(st);
+                });
             }
           }}
         >
@@ -142,21 +168,16 @@ function TruthFooter(originalStatus: mastodon.v1.Status) {
 export default function Truth(props: mastodon.v1.Status) {
   const isRetruth = props.reblog !== null && props.reblog !== undefined;
   const truth = isRetruth ? props.reblog! : props;
-  const text = new DOMParser().parseFromString(
-    truth.content,
-    'text/html',
-  ).textContent;
-  const isLongTruth = text !== null && text.length > 300;
   return (
     <>
       {isRetruth && (
-        <div className="ml-[30px] flex flex-row items-center -mb-[10px] m-[2px]">
-          <RetruthIcon className="bg-green-600" size="16px" />
-          <span className="truncate">{props.account.displayName}</span>
-          <span>Retweeted</span>
+        <div className="ml-[30px] flex flex-row items-center -mb-[10px] m-[2px] mr-[10px]">
+          <RetruthIcon className="bg-green-600 shrink-0" size="16px" />
+          <span className="truncate min-w-0">{props.account.displayName}</span>
+          <span>&nbsp;Retweeted</span>
         </div>
       )}
-      <div className="w-[300px] flex flex-row p-2">
+      <div className="w-[300px] flex flex-row pl-[5px] p-[10px]">
         <div className="h-[40px] aspect-square rounded-md">
           <img
             src={truth.account.avatar}
@@ -164,9 +185,9 @@ export default function Truth(props: mastodon.v1.Status) {
             alt={`${truth.account.displayName}'s avatar`}
           />
         </div>
-        <div className="flex-1 flex flex-col mr-[3px]">
+        <div className="flex-1 overflow-hidden flex flex-col mr-[3px]">
           <TruthHeader {...truth} />
-          <TruthBody {...truth} isLong={isLongTruth} />
+          <TruthBody {...truth} />
           <TruthImage {...truth} />
           <TruthFooter {...truth} />
         </div>
