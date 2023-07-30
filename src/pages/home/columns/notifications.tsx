@@ -16,7 +16,7 @@ export default function NottificationsColumn({ num }: { num: number }) {
   const [notifications, setNotifications] = useState<
     mastodon.v1.Notification[]
   >([]);
-  const [maxId, setMaxId] = useState("");
+  const [maxId, setMaxId] = useState('');
   const uuid = useMemo(() => crypto.randomUUID(), []);
   useEffect(() => {
     api.v1.notifications.list({ limit: 40 }).then((n) => {
@@ -61,45 +61,52 @@ export default function NottificationsColumn({ num }: { num: number }) {
               case 'favourite':
               case 'reblog':
                 return (
-                  <div
-                    className="flex w-[300px] flex-row px-[10px] py-[5px]"
-                    key={n.id}
-                  >
-                    <SvgIcon
-                      svg={n.type === 'favourite' ? Star : Retweet}
-                      size="16px"
-                      className={n.type === 'favourite' ? "bg-yellow-500" : "bg-green-600"}
-                    />
-                    <div className="flex w-[265px] flex-col">
-                      <div className="flex flex-row items-center">
-                        <img
-                          src={n.account.avatar}
-                          className="mr-[2px] w-[24px] rounded-sm"
-                        />
-                        <span className="flex-1 truncate">
-                          {n.account.displayName + " " + (n.type === 'favourite' ? 'liked' : 'retruthed')}
-                        </span>
-                        <ReactTimeAgo
-                          date={Date.parse(n.createdAt)}
-                          locale="en-US"
-                          timeStyle="twitter"
-                        />
-                      </div>
-                      <div className="flex flex-row gap-[2px] text-sm text-gray-600">
-                        <span>{n.status.account.displayName}</span>
-                        <span>{'@' + n.status.account.username}</span>
-                        <span>·</span>
-                        <ReactTimeAgo
-                          date={Date.parse(n.status.createdAt)}
-                          locale="en-US"
-                          timeStyle="twitter"
-                        />
-                      </div>
-                      <div
-                        className="text-gray-600"
-                        dangerouslySetInnerHTML={{ __html: n.status.content }}
+                  <div className="flex w-[300px]  flex-col" key={n.id}>
+                    <div className="flex flex-row px-[10px] py-[5px]">
+                      <SvgIcon
+                        svg={n.type === 'favourite' ? Star : Retweet}
+                        size="16px"
+                        className={
+                          n.type === 'favourite'
+                            ? 'bg-yellow-500'
+                            : 'bg-green-600'
+                        }
                       />
+                      <div className="flex w-[265px] flex-col">
+                        <div className="flex flex-row items-center">
+                          <img
+                            src={n.account.avatar}
+                            className="mr-[2px] w-[24px] rounded-sm"
+                          />
+                          <span className="flex-1 truncate">
+                            {n.account.displayName +
+                              ' ' +
+                              (n.type === 'favourite' ? 'liked' : 'retruthed')}
+                          </span>
+                          <ReactTimeAgo
+                            date={Date.parse(n.createdAt)}
+                            locale="en-US"
+                            timeStyle="twitter"
+                          />
+                        </div>
+                        <div className="flex flex-row gap-[2px] text-sm text-gray-600">
+                          <span>{n.status.account.displayName}</span>
+                          <span>{'@' + n.status.account.username}</span>
+                          <span>·</span>
+                          <ReactTimeAgo
+                            date={Date.parse(n.status.createdAt)}
+                            locale="en-US"
+                            timeStyle="twitter"
+                          />
+                        </div>
+                        <div
+                          className="text-gray-600"
+                          dangerouslySetInnerHTML={{ __html: n.status.content }}
+                        />
+                      </div>
                     </div>
+
+                    <hr className="w-full border-gray-400" />
                   </div>
                 );
               case 'mention':

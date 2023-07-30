@@ -11,7 +11,7 @@ export default function TimelineColumn({ num }: { num: number }) {
   const subscription = useUserStream();
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
   const uuid = useMemo(() => crypto.randomUUID(), []);
-  const [maxId, setMaxId] = useState("");
+  const [maxId, setMaxId] = useState('');
   useEffect(() => {
     api.v1.timelines.home.list({ limit: 40 }).then((tr) => {
       setTruths(tr);

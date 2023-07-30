@@ -15,17 +15,20 @@ export default function UserStatusesColumn({
 }) {
   const api = useApi();
   const [truths, setTruths] = useState<mastodon.v1.Status[]>([]);
-  const [maxId, setMaxId] = useState("");
+  const [maxId, setMaxId] = useState('');
   const [minId, setMinId] = useState('');
   const [userName, setUserName] = useState('');
   const uuid = useMemo(() => crypto.randomUUID(), []);
   useEffect(() => {
-    api.v1.accounts.$select(userId).statuses.list({ limit: 40 }).then((tr) => {
-      setTruths(tr);
-      setUserName(tr[0]?.account.username);
-      setMinId(tr[0].id);
-      setMaxId(tr.slice(-1)[0].id);
-    });
+    api.v1.accounts
+      .$select(userId)
+      .statuses.list({ limit: 40 })
+      .then((tr) => {
+        setTruths(tr);
+        setUserName(tr[0]?.account.username);
+        setMinId(tr[0].id);
+        setMaxId(tr.slice(-1)[0].id);
+      });
     const interval = setInterval(() => {
       api.v1.accounts
         .$select(userId)
@@ -40,7 +43,9 @@ export default function UserStatusesColumn({
     return () => clearInterval(interval);
   }, []);
   const loadMore = async () => {
-    const next = await api.v1.accounts.$select(userId).statuses.list({ limit: 40, maxId: maxId });
+    const next = await api.v1.accounts
+      .$select(userId)
+      .statuses.list({ limit: 40, maxId: maxId });
     setTruths([...truths, ...next]);
     setMaxId(next.slice(-1)[0].id);
   };

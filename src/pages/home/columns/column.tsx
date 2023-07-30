@@ -42,14 +42,14 @@ function ColumnHeader({
                   size="30px"
                 />
               );
-            }  else if (name === "Notifications") {
+            } else if (name === 'Notifications') {
               return (
                 <SvgIcon
                   svg={Notifications}
                   className="aspect-square bg-gray-300"
                   size="30px"
                 />
-              )
+              );
             }
           })()}
           {name}

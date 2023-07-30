@@ -3,7 +3,7 @@ import { ReplyIcon, RetruthIcon, LikeIcon, SvgIcon } from './icon.tsx';
 import { useState } from 'react';
 import { useApi } from '../hooks';
 import ReactTimeAgo from 'react-time-ago';
-import ModalImage from 'react-modal-image';
+import Lightbox, { ImagesListType } from 'react-spring-lightbox';
 import ModalVideo from 'react-modal-video';
 import PlayCircle from '@/assets/play_circle.svg';
 
@@ -58,6 +58,7 @@ function TruthBody(status: mastodon.v1.Status) {
 
 function TruthImage(status: mastodon.v1.Status) {
   const [isOpen, setOpen] = useState(false);
+  const [currentImgIdx, setImgIndex] = useState(0);
   if (status.mediaAttachments.length == 0) return <></>;
   if (status.mediaAttachments[0].type === 'video') {
     const video = status.mediaAttachments[0];
@@ -85,18 +86,71 @@ function TruthImage(status: mastodon.v1.Status) {
       </div>
     );
   }
+  const images: ImagesListType = status.mediaAttachments.map((media) => ({
+    src: media.url!,
+    loading: 'eager',
+    alt: '',
+  }));
+  const len = status.mediaAttachments.length;
   return (
-    <div className="flex w-full flex-col gap-[5px]">
-      {status.mediaAttachments.map((media) => (
-        <ModalImage
-          small={media.previewUrl}
-          large={media.url!}
-          showRotate={true}
-          className={'h-[100px] w-full rounded-md object-cover'}
-          key={media.id}
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={
+          'grid grid-cols-2 gap-[4px] ' + (len <= 2 ? 'h-[125px]' : 'h-[254px]')
+        }
+      >
+        {status.mediaAttachments.map((media, idx) => {
+          if (len % 2 === 1 && idx === len - 1) {
+            return (
+              <button
+                className="col-span-2 h-[125px] w-full"
+                onClick={() => {
+                  setImgIndex(idx);
+                  setOpen(true);
+                }}
+                key={media.id}
+              >
+                <img
+                  className="h-[125px] w-full rounded-md object-cover"
+                  src={media.previewUrl}
+                />
+              </button>
+            );
+          }
+          return (
+            <button
+              className="col-span-1 aspect-square h-[125px] object-cover"
+              onClick={() => {
+                setImgIndex(idx);
+                setOpen(true);
+              }}
+              key={media.id}
+            >
+              <img
+                className="aspect-square h-[125px] w-[119px] rounded-md object-cover"
+                src={media.previewUrl}
+              />
+            </button>
+          );
+        })}
+      </div>
+      <Lightbox
+        isOpen={isOpen}
+        onPrev={() =>
+          currentImgIdx === 0
+            ? setImgIndex(images.length - 1)
+            : setImgIndex(currentImgIdx - 1)
+        }
+        onNext={() =>
+          currentImgIdx === images.length - 1
+            ? setImgIndex(0)
+            : setImgIndex(currentImgIdx + 1)
+        }
+        images={images}
+        currentIndex={currentImgIdx}
+        onClose={() => setOpen(false)}
+      />
+    </>
   );
 }
 function TruthFooter(originalStatus: mastodon.v1.Status) {

@@ -58,7 +58,7 @@ export default function Sidebar({
                   className="bg-gray-300"
                   key="notifications"
                 />
-              )
+              );
           }
         })}
       </ReactSortable>
